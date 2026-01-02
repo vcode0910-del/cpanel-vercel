@@ -1,7 +1,7 @@
 <?php
 // --- PENGATURAN API ---
-$PANEL_URL = "https://panel.domainanda.com"; // Ganti dengan URL Panel Anda
-$API_KEY   = "ptla_xxxxxxxxxxxxxxxxxxxx";   // Ganti dengan API Key Application Anda
+$PANEL_URL = "https://duhaistore.servercloud.my.id/"; // Ganti dengan URL Panel Anda
+$API_KEY   = "ptla_AaTVmBOOKxi5LMlQQUh2gOMlooFXxvAw7PApfEs4iyX";   // Ganti dengan API Key Application Anda
 // ----------------------
 
 $message = "";
