@@ -1,7 +1,7 @@
 <?php
 // --- PENGATURAN API ---
 $PANEL_URL = "https://duhaistore.servercloud.my.id"; // PASTIKAN PAKAI HTTPS DAN TANPA TANDA / DI AKHIR
-$API_KEY   = "ptla_AaTVmBOOKxi5LMlQQUh2gOMlooFXxvAw7PApfEs4iyX";   // GUNAKAN APPLICATION API KEY
+$API_KEY   = "ptla_PCjOecFOB2TdbS47qhJCTMxtkOMrf07zJHno4Bl3UwD";   // GUNAKAN APPLICATION API KEY
 // ----------------------
 
 $message = "";
