@@ -1,10 +1,12 @@
 <?php
 // --- PENGATURAN API ---
-$PANEL_URL = "https://duhaistore.servercloud.my.id"; // Ganti dengan URL Panel Anda
-$API_KEY   = "ptla_AaTVmBOOKxi5LMlQQUh2gOMlooFXxvAw7PApfEs4iyX";   // Ganti dengan API Key Application Anda
+$PANEL_URL = "https://duhaistore.servercloud.my.id"; // PASTIKAN PAKAI HTTPS DAN TANPA TANDA / DI AKHIR
+$API_KEY   = "ptla_AaTVmBOOKxi5LMlQQUh2gOMlooFXxvAw7PApfEs4iyX";   // GUNAKAN APPLICATION API KEY
 // ----------------------
 
 $message = "";
+$debug_info = "";
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $user  = $_POST['username'];
@@ -20,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $ch = curl_init("$PANEL_URL/api/application/users");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Authorization: Bearer $API_KEY",
         "Accept: application/json",
@@ -30,94 +33,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
 
     if ($httpCode == 201) {
-        $message = "<div class='alert alert-success'>✅ Akun berhasil dibuat! Silakan cek email/panel.</div>";
+        $message = "<div class='alert alert-success'>✅ Akun berhasil dibuat!</div>";
     } else {
-        $message = "<div class='alert alert-danger'>❌ Gagal! Akun mungkin sudah ada atau API Key salah.</div>";
+        $message = "<div class='alert alert-danger'>❌ Gagal! Lihat detail error di bawah kotak ini.</div>";
+        // Simpan info debug untuk ditampilkan di bawah form
+        $debug_info = [
+            "HTTP_CODE" => $httpCode,
+            "CURL_ERROR" => $curlError,
+            "RAW_RESPONSE" => json_decode($response, true) ?: $response
+        ];
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pterodactyl Register</title>
-    <!-- Bootstrap CSS -->
+    <title>Debug Register Pterodactyl</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Custom CSS agar tampilan keren di Vercel */
-        body { 
-            background: #1a1c23; 
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card { 
-            background: #242731; 
-            border: 1px solid #323541; 
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-        .form-control {
-            background: #1a1c23;
-            border: 1px solid #323541;
-            color: white;
-        }
-        .form-control:focus {
-            background: #1a1c23;
-            color: white;
-            border-color: #3b82f6;
-            box-shadow: none;
-        }
-        .btn-primary {
-            background: #3b82f6;
-            border: none;
-            padding: 10px;
-            font-weight: bold;
-        }
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-        label { margin-bottom: 5px; font-size: 14px; color: #a0aec0; }
-    </style>
+    <style>body { background: #1a1c23; color: white; padding-top: 50px; }</style>
 </head>
 <body>
+    <div class="container" style="max-width: 500px;">
+        <div class="card bg-dark border-secondary text-white p-4">
+            <h4 class="text-center">Register Test</h4>
+            <?php echo $message; ?>
+            <form method="POST">
+                <input type="text" name="username" class="form-control mb-2" placeholder="Username" required>
+                <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
+                <input type="password" name="password" class="form-control mb-2" placeholder="Password" required>
+                <button type="submit" class="btn btn-primary w-100">Coba Daftar</button>
+            </form>
+        </div>
 
-    <div class="card shadow-lg">
-        <h4 class="text-center mb-4">Register Panel</h4>
-        
-        <?php echo $message; ?>
-
-        <form method="POST">
-            <div class="mb-3">
-                <label>Username</label>
-                <input type="text" name="username" class="form-control" placeholder="Contoh: user123" required>
-            </div>
-            <div class="mb-3">
-                <label>Email Address</label>
-                <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" placeholder="Min. 8 Karakter" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 mt-2">Buat Akun</button>
-        </form>
-        
-        <p class="text-center mt-4" style="font-size: 12px; color: #718096;">
-            &copy; 2024 Cloud Hosting Integration
-        </p>
+        <?php if ($debug_info): ?>
+        <div class="mt-4 p-3 bg-black text-warning border border-warning shadow" style="font-family: monospace; font-size: 12px; overflow-x: auto;">
+            <h5>DEBUG INFO (PENTING):</h5>
+            <pre><?php print_r($debug_info); ?></pre>
+        </div>
+        <?php endif; ?>
     </div>
-
 </body>
 </html>
